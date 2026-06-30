@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catatan Kecilku</title>
+<style>
+  :root {
+    --bg: #FFFDF8;
+    --ink: #2C2C2A;
+    --ink-soft: #6B6A63;
+    --card: #FFFFFF;
+    --border: #ECE8DD;
+    --coral: #F0997B;
+    --coral-dark: #4A1B0C;
+    --coral-bg: #FAECE7;
+    --purple: #AFA9EC;
+    --purple-dark: #26215C;
+    --purple-bg: #EEEDFE;
+    --teal: #5DCAA5;
+    --teal-dark: #04342C;
+    --teal-bg: #E1F5EE;
+    --amber: #FAC775;
+    --amber-dark: #412402;
+    --amber-bg: #FAEEDA;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+
+  header {
+    text-align: center;
+    padding: 56px 20px 28px;
+  }
+
+  .dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 18px; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .dot:nth-child(1) { background: var(--coral); }
+  .dot:nth-child(2) { background: var(--amber); }
+  .dot:nth-child(3) { background: #97C459; }
+  .dot:nth-child(4) { background: #85B7EB; }
+  .dot:nth-child(5) { background: var(--purple); }
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+  }
+
+  .filters {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 24px 0 36px;
+  }
+
+  .filter-btn {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    background: var(--teal-bg);
+    color: var(--teal-dark);
+    transition: transform 0.15s ease;
+  }
+  .filter-btn:hover { transform: translateY(-1px); }
+  .filter-btn.active {
+    background: var(--purple);
+    color: var(--purple-dark);
+  }
+
+  .posts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+    padding-bottom: 60px;
+  }
+
+  .post-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .post-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  }
+
+  .reader-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(44, 44, 42, 0.45);
+    z-index: 50;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 40px 20px;
+  }
+  .reader-overlay.open { display: flex; }
+
+  .reader-box {
+    background: var(--bg);
+    max-width: 640px;
+    width: 100%;
+    border-radius: 20px;
+    padding: 40px 36px 50px;
+    position: relative;
+  }
+
+  .reader-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: var(--purple-bg);
+    color: var(--purple-dark);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .reader-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 11px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+
+  .reader-title {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+
+  .reader-date {
+    font-size: 13px;
+    color: #9A988F;
+    margin-bottom: 28px;
+  }
+
+  .reader-content {
+    font-size: 16px;
+    line-height: 1.85;
+    color: var(--ink);
+  }
+  .reader-content p { margin-bottom: 18px; }
+  .reader-content h2 { font-size: 21px; margin: 28px 0 12px; }
+  .reader-content h3 { font-size: 18px; margin: 24px 0 10px; }
+  .reader-content blockquote {
+    border-left: 3px solid var(--purple);
+    padding-left: 16px;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin: 18px 0;
+  }
+  .reader-content li { margin-left: 20px; margin-bottom: 8px; }
+  .reader-content hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+  .bar { height: 5px; border-radius: 4px; margin-bottom: 14px; }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 11px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    text-transform: lowercase;
+  }
+
+  .post-title {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+
+  .post-excerpt {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+  }
+
+  .post-date {
+    font-size: 12px;
+    color: #9A988F;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-soft);
+  }
+
+  .loading {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 24px 20px 50px;
+    font-size: 13px;
+    color: #B4B2A9;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="dots">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="dot"></span><span class="dot"></span>
+    </div>
+    <h1>Catatan Kecilku</h1>
+    <p class="subtitle">potongan hari-hari yang lewat begitu saja — ditangkap sebelum hilang</p>
+  </header>
+
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-cat="semua">semua</button>
+  </div>
+
+  <div id="posts-container">
+    <div class="loading">Memuat tulisan...</div>
+  </div>
+
+  <footer>dibuat dengan ♡</footer>
+</div>
+
+<div class="reader-overlay" id="reader-overlay">
+  <div class="reader-box">
+    <button class="reader-close" id="reader-close" aria-label="Tutup">&times;</button>
+    <span class="reader-tag" id="reader-tag"></span>
+    <div class="reader-title" id="reader-title"></div>
+    <div class="reader-date" id="reader-date"></div>
+    <div class="reader-content" id="reader-content"></div>
+  </div>
+</div>
+
+<script>
+  const COLORS = [
+    { bar: '#F0997B', bg: '#FAECE7', dark: '#4A1B0C' },
+    { bar: '#AFA9EC', bg: '#EEEDFE', dark: '#26215C' },
+    { bar: '#5DCAA5', bg: '#E1F5EE', dark: '#04342C' },
+    { bar: '#FAC775', bg: '#FAEEDA', dark: '#412402' },
+    { bar: '#ED93B1', bg: '#FBEAF0', dark: '#4B1528' },
+  ];
+
+  let allPosts = [];
+  let activeCategory = 'semua';
+
+  function colorFor(category) {
+    let hash = 0;
+    for (let i = 0; i < category.length; i++) hash += category.charCodeAt(i);
+    return COLORS[hash % COLORS.length];
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    return `${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`;
+  }
+
+  function renderFilters(posts) {
+    const cats = [...new Set(posts.map(p => p.category).filter(Boolean))];
+    const filtersEl = document.getElementById('filters');
+    filtersEl.innerHTML = '<button class="filter-btn active" data-cat="semua">semua</button>' +
+      cats.map(c => `<button class="filter-btn" data-cat="${c}">${c}</button>`).join('');
+
+    filtersEl.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        filtersEl.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeCategory = btn.dataset.cat;
+        renderPosts();
+      });
+    });
+  }
+
+  function renderPosts() {
+    const container = document.getElementById('posts-container');
+    const filtered = activeCategory === 'semua'
+      ? allPosts
+      : allPosts.filter(p => p.category === activeCategory);
+
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="empty-state">Belum ada tulisan di kategori ini.</div>';
+      return;
+    }
+
+    container.innerHTML = '<div class="posts">' + filtered.map(post => {
+      const c = colorFor(post.category || 'umum');
+      return `
+        <div class="post-card" data-id="${post.id}">
+          <div class="bar" style="background:${c.bar}"></div>
+          ${post.category ? `<span class="tag" style="background:${c.bg};color:${c.dark}">${post.category}</span>` : ''}
+          <div class="post-title">${post.title || 'Tanpa judul'}</div>
+          <div class="post-excerpt">${post.excerpt || ''}</div>
+          <div class="post-date">${formatDate(post.date)}</div>
+        </div>
+      `;
+    }).join('') + '</div>';
+
+    container.querySelectorAll('.post-card').forEach(card => {
+      card.addEventListener('click', () => openReader(card.dataset.id));
+    });
+  }
+
+  function openReader(id) {
+    const post = allPosts.find(p => p.id === id);
+    if (!post) return;
+
+    const c = colorFor(post.category || 'umum');
+    const tagEl = document.getElementById('reader-tag');
+    if (post.category) {
+      tagEl.style.display = 'inline-block';
+      tagEl.style.background = c.bg;
+      tagEl.style.color = c.dark;
+      tagEl.textContent = post.category;
+    } else {
+      tagEl.style.display = 'none';
+    }
+
+    document.getElementById('reader-title').textContent = post.title || 'Tanpa judul';
+    document.getElementById('reader-date').textContent = formatDate(post.date);
+    document.getElementById('reader-content').innerHTML =
+      post.content && post.content.trim() ? post.content : `<p>${post.excerpt || ''}</p>`;
+
+    document.getElementById('reader-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeReader() {
+    document.getElementById('reader-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('reader-close').addEventListener('click', closeReader);
+  document.getElementById('reader-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'reader-overlay') closeReader();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeReader();
+  });
+
+  fetch('posts.json')
+    .then(res => res.json())
+    .then(data => {
+      allPosts = data;
+      if (allPosts.length === 0) {
+        document.getElementById('posts-container').innerHTML =
+          '<div class="empty-state">Belum ada tulisan yang dipublikasikan.</div>';
+        return;
+      }
+      renderFilters(allPosts);
+      renderPosts();
+    })
+    .catch(() => {
+      document.getElementById('posts-container').innerHTML =
+        '<div class="empty-state">Gagal memuat tulisan. Pastikan file posts.json ada di folder yang sama.</div>';
+    });
+</script>
+
+</body>
+</html>
