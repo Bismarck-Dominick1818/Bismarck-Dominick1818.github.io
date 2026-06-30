@@ -1,100 +1,73 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dom's Journal</title>
-    <style>
-        root {
-    --bg: #FFFDF8;
-    --ink: #2C2C2A;
-    --ink-soft: #6B6A63;
-    --card: #FFFFFF;
-    --border: #ECE8DD;
-    --coral: #F0997B;
-    --coral-dark: #4A1B0C;
-    --coral-bg: #FAECE7;
-    --purple: #AFA9EC;
-    --purple-dark: #26215C;
-    --purple-bg: #EEEDFE;
-    --teal: #5DCAA5;
-    --teal-dark: #04342C;
-    --teal-bg: #E1F5EE;
-    --amber: #FAC775;
-    --amber-dark: #412402;
-    --amber-bg: #FAEEDA;
-  }
-
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fafafa; color: #333; margin: 0; padding: 20px; }
-        .header { text-align: center; margin-bottom: 40px; }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .header p { color: #666; }
-        
-        /* Grid 3x3 Layout */
-        #posts-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        /* Styling Kartu */
-        .post-card {
-            background: #fff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            cursor: pointer;
-            transition: transform 0.2s;
-            display: flex;
-            flex-direction: column;
-        }
-        .post-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
-        .cover-img { width: 100%; height: 200px; object-fit: cover; }
-        .post-content { padding: 20px; flex-grow: 1; }
-        .category { display: inline-block; padding: 4px 12px; background: #e0f7fa; color: #00796b; border-radius: 20px; font-size: 0.8em; font-weight: bold; margin-bottom: 10px; }
-        .post-title { font-size: 1.2em; margin: 0 0 10px 0; }
-        .post-date { color: #888; font-size: 0.9em; margin: 0; }
-
-        @media (max-width: 900px) { #posts-container { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 600px) { #posts-container { grid-template-columns: 1fr; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dom's Journal</title>
+<style>
+  :root { --bg: #FFFDF8; --ink: #2C2C2A; --ink-soft: #6B6A63; --card: #FFFFFF; --border: #ECE8DD; --coral: #F0997B; --purple: #AFA9EC; --purple-dark: #26215C; --purple-bg: #EEEDFE; --teal-bg: #E1F5EE; --teal-dark: #04342C; --amber: #FAC775; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); line-height: 1.6; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+  header { text-align: center; padding: 56px 20px 28px; }
+  .filters { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 24px 0 36px; }
+  .filter-btn { padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; background: var(--teal-bg); color: var(--teal-dark); }
+  .filter-btn.active { background: var(--purple); color: var(--purple-dark); }
+  .posts { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; padding-bottom: 60px; }
+  .post-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 22px; cursor: pointer; transition: transform 0.18s ease; text-decoration: none; color: inherit; display: block; }
+  .post-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+  .bar { height: 5px; border-radius: 4px; margin-bottom: 14px; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 11px; border-radius: 10px; margin-bottom: 10px; text-transform: lowercase; }
+  .post-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .post-excerpt { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 14px; }
+  .post-date { font-size: 12px; color: #9A988F; }
+</style>
 </head>
 <body>
-    <div class="header">
-        <h1>Dom's Journal</h1>
-        <p>Beberapa cerita tentang keseharian gue menjalani kehidupan ini.</p>
-    </div>
 
-    <div id="posts-container">
-        <!-- Kartu cerita akan dimuat di sini -->
-    </div>
+<div class="wrap">
+  <header>
+    <h1>Dom's Journal</h1>
+    <p>Beberapa cerita tentang keseharian gue menjalani hidup ini</p>
+  </header>
 
-    <script>
-        fetch('posts.json')
-            .then(response => response.json())
-            .then(posts => {
-                const container = document.getElementById('posts-container');
-                posts.forEach(post => {
-                    const coverHTML = post.cover ? `<img src="${post.cover}" class="cover-img" alt="Cover">` : '<div style="height:200px; background:#eee; display:flex; align-items:center; justify-content:center; color:#aaa;">No Cover</div>';
-                    
-                    const card = document.createElement('div');
-                    card.className = 'post-card';
-                    card.innerHTML = `
-                        ${coverHTML}
-                        <div class="post-content">
-                            <span class="category">${post.category}</span>
-                            <h3 class="post-title">${post.title}</h3>
-                            <p class="post-date">${post.date}</p>
-                        </div>
-                    `;
-                    // Arahkan ke halaman spesifik saat diklik
-                    card.onclick = () => { window.location.href = `post.html?id=${post.id}`; };
-                    container.appendChild(card);
-                });
-            })
-            .catch(error => console.error('Error loading posts:', error));
-    </script>
+  <div class="filters" id="filters"></div>
+  <div id="posts-container"><div class="loading">Memuat tulisan...</div></div>
+</div>
+
+<script>
+  const COLORS = [{ bar: '#F0997B', bg: '#FAECE7', dark: '#4A1B0C' }, { bar: '#AFA9EC', bg: '#EEEDFE', dark: '#26215C' }, { bar: '#5DCAA5', bg: '#E1F5EE', dark: '#04342C' }];
+  let allPosts = [];
+  let activeCategory = 'semua';
+
+  function colorFor(category) {
+    let hash = 0;
+    for (let i = 0; i < category.length; i++) hash += category.charCodeAt(i);
+    return COLORS[hash % COLORS.length];
+  }
+
+  function renderPosts() {
+    const container = document.getElementById('posts-container');
+    const filtered = activeCategory === 'semua' ? allPosts : allPosts.filter(p => p.category === activeCategory);
+    
+    container.innerHTML = '<div class="posts">' + filtered.map(post => {
+      const c = colorFor(post.category || 'umum');
+      return `
+        <a href="post.html?id=${post.id}" class="post-card">
+          <div class="bar" style="background:${c.bar}"></div>
+          ${post.category ? `<span class="tag" style="background:${c.bg};color:${c.dark}">${post.category}</span>` : ''}
+          <div class="post-title">${post.title || 'Tanpa judul'}</div>
+          <div class="post-excerpt">${post.excerpt || ''}</div>
+          <div class="post-date">${post.date}</div>
+        </a>
+      `;
+    }).join('') + '</div>';
+  }
+
+  fetch('posts.json').then(res => res.json()).then(data => {
+    allPosts = data;
+    renderPosts();
+  });
+</script>
 </body>
 </html>
