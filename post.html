@@ -6,22 +6,46 @@
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
 <title>Membaca...</title>
 <style>
-  body { font-family: 'Atkinson Hyperlegible', sans-serif; background: #FFFDF8; color: #2C2C2A; line-height: 1.9; padding: 60px 20px; transition: 0.3s; }
+  /* Base Style */
+  body { 
+    font-family: 'Atkinson Hyperlegible', sans-serif; 
+    background: #FFFDF8; 
+    color: #2C2C2A; 
+    line-height: 1.9; 
+    padding: 60px 20px; 
+    transition: 0.3s; 
+  }
+
+  /* Dark Mode */
   body.dark-mode { background: #1a1a19; color: #EAE9E4; }
   body.dark-mode .back-btn { color: #A8A7A0; }
   
+  /* Layout Konten */
   .wrap { max-width: 800px; margin: 0 auto; }
   .back-btn { display: inline-block; margin-bottom: 30px; text-decoration: none; color: #6B6A63; font-size: 14px; }
   
-  #cover-img { width: 100%; height: 350px; object-fit: cover; border-radius: 20px; margin-bottom: 30px; display: none; }
+  /* Image Cover */
+  #cover-img { 
+    width: 100%; 
+    height: 350px; 
+    object-fit: cover; 
+    border-radius: 20px; 
+    margin-bottom: 30px; 
+    display: none; 
+  }
+  
+  /* Typography */
   #title { font-size: 36px; font-weight: 700; margin-bottom: 20px; line-height: 1.2; }
   #date { color: #9A988F; margin-bottom: 40px; font-size: 15px; }
 
+  /* Content */
   .reader-content { text-align: justify; font-size: 17px; }
   .reader-content img { max-width: 100%; border-radius: 16px; margin: 30px 0; }
+  .reader-content p { margin-bottom: 20px; }
 </style>
 </head>
 <body>
+
 <div class="wrap">
   <a href="index.html" class="back-btn">← Kembali ke beranda</a>
   <img id="cover-img" src="" alt="Cover">
@@ -31,11 +55,15 @@
 </div>
 
 <script>
-  if (localStorage.getItem('darkMode') === 'enabled') document.body.classList.add('dark-mode');
+  // Sinkronisasi Dark Mode dari localStorage
+  if (localStorage.getItem('darkMode') === 'enabled') {
+    document.body.classList.add('dark-mode');
+  }
 
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get('id');
 
+  // Ambil data dari JSON
   fetch('posts.json').then(res => res.json()).then(posts => {
     const post = posts.find(p => p.id === id);
     if (post) {
@@ -43,11 +71,17 @@
       document.getElementById('title').textContent = post.title;
       document.getElementById('date').textContent = post.date;
       document.getElementById('content').innerHTML = post.content;
-      if (post.cover) {
-        const img = document.getElementById('cover-img');
+      
+      // Logika Gambar Cover
+      const img = document.getElementById('cover-img');
+      if (post.cover && post.cover.trim() !== "") {
         img.src = post.cover;
         img.style.display = 'block';
+      } else {
+        img.style.display = 'none';
       }
+    } else {
+      document.getElementById('content').innerHTML = "Tulisan tidak ditemukan.";
     }
   });
 </script>
